@@ -54,8 +54,46 @@ CRUD
 - READ : Mengambil data produk, sejarah Jurnal Pengguna.
 - UPDATE: Mengubah isi Jurnal Entry.
 - DELETE: Menghapus sebuah Jurnal Entry.
+
+<br> 
+
+2. WhatToEat? - Hubban Syadid <br><br>  
   
-...CONTINUE HERE...  
+Features:  
+- Dapat melihat produk random yang sudah ada di dalam aplikasi, yang mana nantinya dapat di jadikan acuan sebagai rekomendasi makanan
+- Terdapat sorting untuk menampilkan kategori makanan tertentu
+- apabila user swipe kanan karena menyukai produk, maka user akan langsung di arahkan ke page detail produk tersebut
+
+<br>
+
+CRUD
+- CREATE: Membuat card untuk produk
+- READ : Membaca semua produk yang sudah ada sebelumya di database
+- UPDATE: Memperbarui posisi dari card setelah di dismiss
+- DELETE: Remove card yang sudah di swipe left
+ 
+<br>
+3. Dashboard Admin - Najya Johara R <br><br>
+<br>
+Features <br>
+- Add Product: menambahkan produk sesuai dengan toko yang ada di database <br>
+- Add Store: menambahkan toko baru <br>
+- Edit product dan Edit Store: untuk memperbaharui toko ataupun produk <br>
+<br>
+
+Rincian regulasi aturan khusus:
+- Responsive Framework: memastikan halaman ramah untuk tampilan pada mobile
+- Forms: digunakan untuk add dan edit produk dan toko
+- Product Filtering: filter produk bisa berdasarkan lokasi, harga, ataupun kategori makanan
+- Login Filters: hanya user yang di-assign sebagai admin yang bisa mengakses halaman ini
+  
+<br>
+
+CRUD
+- CREATE: membuat toko baru dan menambahkan produk
+- READ: menampilkan semua toko beserta produk yang ada di dalamnya
+- UPDATE: mengubah toko dan produk yang sudah ada
+- DELETE: menghapus toko dan produk yang sudah ada
 
 </details>
 
@@ -75,20 +113,17 @@ User Biasa:
 Developer:  
 - Sama seperti User Biasa, tapi ditambah kemampuan untuk melakukan CRUD pada data terkait produk atau restoran.
 - Bisa menambah link ke fitur lain yang hanya diakses oleh developer.
+<br>
 
-2. WhatToEat? - Hubban Syadid <br><br>  
+2. WhatToEat
+3. Dashboard Admin <br><br>
+User biasa:
+- user yang tidak terdaftar sebagai admin tidak dapat mengakses halaman ini
   
-Features:  
-- Dapat melihat produk random yang sudah ada di dalam aplikasi, yang mana nantinya dapat di jadikan acuan sebagai rekomendasi makanan
-- Terdapat sorting untuk menampilkan kategori makanan tertentu
-- apabila user swipe kanan karena menyukai produk, maka user akan langsung di arahkan ke page detail produk tersebut
-  
-CRUD
-- CREATE: Membuat card untuk produk
-- READ : Membaca semua produk yang sudah ada sebelumya di database
-- UPDATE: Memperbarui posisi dari card setelah di dismiss
-- DELETE: Remove card yang sudah di swipe left 
+<br>
 
+Developer:
+- Dapat melakukan penambahakn, pengahpusan, dan memperbaharui produk dan toko
 
 ...CONTINUE HERE...
   
