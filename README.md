@@ -76,6 +76,20 @@ Developer:
 - Sama seperti User Biasa, tapi ditambah kemampuan untuk melakukan CRUD pada data terkait produk atau restoran.
 - Bisa menambah link ke fitur lain yang hanya diakses oleh developer.
 
+2. WhatToEat? - Hubban Syadid <br><br>  
+  
+Features:  
+- Dapat melihat produk random yang sudah ada di dalam aplikasi, yang mana nantinya dapat di jadikan acuan sebagai rekomendasi makanan
+- Terdapat sorting untuk menampilkan kategori makanan tertentu
+- apabila user swipe kanan karena menyukai produk, maka user akan langsung di arahkan ke page detail produk tersebut
+  
+CRUD
+- CREATE: Membuat card untuk produk
+- READ : Membaca semua produk yang sudah ada sebelumya di database
+- UPDATE: Memperbarui posisi dari card setelah di dismiss
+- DELETE: Remove card yang sudah di swipe left 
+
+
 ...CONTINUE HERE...
   
 </details>
