@@ -26,7 +26,7 @@ Tim A12SITEK memilih Kota Bandung karena dikenal sebagai kota wisata yang popule
 1. Dashboard - Karina Maharani<br><br>  
   
 Section Home<br>
-Features:  
+Features:
 - Navigation hub, link ke modul-modul lain.  
 - Landing Page yang membaca data, memiliki Link-link ke product highly-rated, dan banner ke modul lainnya 
 - Search bar yang tersambung dengan modul search system.   
@@ -61,14 +61,18 @@ CRUD
 
 <details>
   <summary>iii. Deskripsi role-role User dan Wewenang</summary>
-1. Dashboard
+1. Dashboard<br><br>  
+  
 User Biasa:
 - Bisa melihat recent activity seperti pencarian terbaru atau ulasan yang pernah dibuat.
 - Bisa CRUD Jurnal Entry pada toko pada profil User
 - Melihat favorite products atau restoran yang sudah pernah di-review atau diberi rating.
 - Akses ke link highly-rated products berdasarkan preferensi mereka.
 - Gunakan search bar untuk menelusuri produk atau restoran.
-Developer:
+
+<br>
+
+Developer:  
 - Sama seperti User Biasa, tapi ditambah kemampuan untuk melakukan CRUD pada data terkait produk atau restoran.
 - Bisa menambah link ke fitur lain yang hanya diakses oleh developer.
 
