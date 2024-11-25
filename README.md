@@ -145,6 +145,14 @@ User biasa:
 Developer:
 - Dapat melakukan penambahakn, pengahpusan, dan memperbaharui produk dan toko
 
+4. Map <br>
+User biasa:
+- User dapat melihat map dan query berdasarkan kecamatan yang dipilih, membuat dan mengupdate atau delete travel plan.
+<br>
+Developer:<br>
+- Semua aktivitas admin terkait database sudah ada di dashboard admin, maka tidak ada perbedaan.
+
+<br>
 ...CONTINUE HERE...
   
 </details>
