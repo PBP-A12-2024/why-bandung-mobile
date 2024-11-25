@@ -94,6 +94,26 @@ CRUD
 - READ: menampilkan semua toko beserta produk yang ada di dalamnya
 - UPDATE: mengubah toko dan produk yang sudah ada
 - DELETE: menghapus toko dan produk yang sudah ada
+4. Map - Farrel Dharmawan Dwiyudanto  <br>
+
+Features: <br>
+- Map dari Kota Bandung yang tersambung dengan database digunakan untuk query berdasarkan kecamatan yang ada di bandung. <br>
+- Membaca data dan menampilkan result berupa toko atau restoran yang ada berdasarkan kecamatan yang di-click, lalu dari result tersebut dapat ditampilkan menu atau apapun yang dijual di toko atau restoran tersebut. <br>
+- Travel plan dari pengguna yang berisi restoran yang ingin dikunjungi, lengkap dengan deskripsi dan tanggal yang direncanakan. <br>
+ <br>
+ 
+Rincian regulasi aturan khusus: <br>
+- Responsive Framework: Menggunakan function media query, classes, packages, atau libraries dari flutter. <br>
+- Forms: Travel plan pengguna  <br>
+- Product Filtering: Menyaring restoran berdasarkan kecamatan yang dipilih, lalu menyaring hidangan berdasarkan restoran yang dipilih. <br>
+ <br>
+ 
+CRUD: <br>
+Create: Menambah restoran ke travel plan pengguna.  <br>
+Read: Mengambil data restoran dan hidangan, mengambil isi travel plan pengguna.  <br>
+Update: Menambah isi travel plan.  <br>
+Delete: Menghapus restoran dari travel plan.  <br>
+
 
 </details>
 
