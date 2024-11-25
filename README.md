@@ -114,7 +114,26 @@ Read: Mengambil data restoran dan hidangan, mengambil isi travel plan pengguna. 
 Update: Menambah isi travel plan.  <br>
 Delete: Menghapus restoran dari travel plan.  <br>
 
-
+5. Product Page - Muhammad Fadhil Nur Aziz <br><br>
+<br>
+Features: <br>
+- Menampilkan informasi detail produk/menu, seperti: Nama produk/menu, Deskripsi singkat, Harga
+- Pengguna bisa menulis ulasan mereka sendiri, memberi rating (1-5 bintang)
+- Menampilkan produk atau menu lain yang relevan, berdasarkan kategori serupa.
+<br>
+Rincian Regulasi Aturan Khusus:
+- Responsive Framework: Halaman dioptimalkan untuk semua perangkat, termasuk mobile.
+- Forms: Digunakan untuk menambahkan ulasan, memberi rating, atau menambahkan tag.
+- AJAX: Memungkinkan pengiriman ulasan tanpa perlu memuat ulang halaman.
+- Login Filters: Hanya pengguna yang login dapat memberikan ulasan atau rating produk.
+- Product Filtering: Memudahkan pengguna mencari produk berdasarkan tag atau rating tertentu.
+<br>
+CRUD:
+CREATE: Membuat ulasan atau review baru, menambahkan rating, dan tag.
+READ: Menampilkan detail produk, daftar ulasan, dan informasi rating.
+UPDATE: Mengedit ulasan atau rating yang telah diberikan sebelumnya.
+DELETE: Menghapus ulasan yang sudah tidak relevan atau diinginkan pengguna.
+<br>
 </details>
 
 <details>
@@ -152,8 +171,15 @@ User biasa:
 Developer:<br>
 - Semua aktivitas admin terkait database sudah ada di dashboard admin, maka tidak ada perbedaan.
 
+
+5. Product Page:<br>
+User biasa:
+- User bisa melihat detail produk atau restoran, seperti nama restoran, menu yang tersedia, dan ulasan dari user lain.
+- User bisa menambah, mengedit, menghapus ulasan
 <br>
-...CONTINUE HERE...
+Developer:<br>
+- Sama dengan User Biasa, tetapi developer bisa mengedit dan menghapus ulasan.
+<br>
   
 </details>
 
