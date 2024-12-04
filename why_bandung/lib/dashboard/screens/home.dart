@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'profile.dart'; // Import the ProfilePage
 
 void main() {
   runApp(const MyApp());
@@ -24,6 +25,46 @@ class MainPage extends StatelessWidget {
         backgroundColor: Colors.teal,
         title: const Text('Why Bandung?'),
         centerTitle: true,
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            // Drawer Header
+            const DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.teal,
+              ),
+              child: Text(
+                'Menu',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                ),
+              ),
+            ),
+            // Profile Navigation Item
+            ListTile(
+              leading: const Icon(Icons.person),
+              title: const Text('Profile'),
+              onTap: () {
+                // Navigate to Profile Page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProfilePage()),
+                );
+              },
+            ),
+            // Add other menu items as needed
+            ListTile(
+              leading: const Icon(Icons.home),
+              title: const Text('Home'),
+              onTap: () {
+                Navigator.pop(context); // Close the drawer
+              },
+            ),
+          ],
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
