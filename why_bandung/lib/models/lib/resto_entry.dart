@@ -1,7 +1,3 @@
-// To parse this JSON data, do
-//
-//     final welcome = welcomeFromJson(jsonString);
-
 import 'dart:convert';
 
 Welcome welcomeFromJson(String str) => Welcome.fromJson(json.decode(str));
@@ -25,44 +21,24 @@ class Welcome {
 }
 
 class Toko {
-    String model;
-    String pk;
-    Fields fields;
-
-    Toko({
-        required this.model,
-        required this.pk,
-        required this.fields,
-    });
-
-    factory Toko.fromJson(Map<String, dynamic> json) => Toko(
-        model: json["model"],
-        pk: json["pk"],
-        fields: Fields.fromJson(json["fields"]),
-    );
-
-    Map<String, dynamic> toJson() => {
-        "model": model,
-        "pk": pk,
-        "fields": fields.toJson(),
-    };
-}
-
-class Fields {
+    String id;
     String name;
     String location;
 
-    Fields({
+    Toko({
+        required this.id,
         required this.name,
         required this.location,
     });
 
-    factory Fields.fromJson(Map<String, dynamic> json) => Fields(
+    factory Toko.fromJson(Map<String, dynamic> json) => Toko(
+        id: json["id"],
         name: json["name"],
         location: json["location"],
     );
 
     Map<String, dynamic> toJson() => {
+        "id": id,
         "name": name,
         "location": location,
     };

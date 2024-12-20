@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:why_bandung/dashboard_admin/screens/restoentry_form.dart';
-import 'package:why_bandung/models/lib/resto_entry.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:why_bandung/models/lib/resto_entry.dart';  // Update with the correct path for your models
+import 'package:why_bandung/dashboard_admin/screens/produkentry_form.dart';
+import 'package:why_bandung/dashboard_admin/screens/restoentry_form.dart'; // Update with correct path to ProductForm
+import 'package:why_bandung/dashboard_admin/screens/widgets/food_card.dart'; // Update with correct path to FoodCard
+
 void main() {
   runApp(const MyApp());
 }
@@ -23,13 +28,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class ItemHomepage {
-  final String name;
-  final IconData icon;
-
-  ItemHomepage(this.name, this.icon);
-}
-
 class AdminPage extends StatefulWidget {
   @override
   State<AdminPage> createState() => _AdminPageState();
@@ -41,18 +39,30 @@ class _AdminPageState extends State<AdminPage> {
     ItemHomepage("Add Product", Icons.add),
   ];
 
-  Welcome welcomeData = Welcome(toko: []); // Untuk menyimpan data toko
+  late Future<List<Toko>> tokoList;
 
-  void addRestaurant(Fields fields) {
-    setState(() {
-      // Membuat Toko baru
-      Toko newToko = Toko(
-        model: "restaurant.restaurant",
-        pk: DateTime.now().toString(), // Temporary pk
-        fields: fields,
-      );
-      welcomeData.toko.add(newToko);
-    });
+  @override
+  void initState() {
+    super.initState();
+    tokoList = fetchTokoData(); // Fetch data when the page is initialized
+  }
+
+  // Fetch data from Django API for restaurants (toko)
+  Future<List<Toko>> fetchTokoData() async {
+    final response = await http.get(Uri.parse('http://localhost:8000/admin/all-toko/')); // Update with your Django API endpoint
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+
+      if (data.containsKey('toko') && data['toko'] is List) {
+        List<dynamic> tokoListData = data['toko'];
+        return tokoListData.map((json) => Toko.fromJson(json)).toList();
+      } else {
+        throw Exception('Invalid data for toko');
+      }
+    } else {
+      throw Exception('Failed to load restaurants');
+    }
   }
 
   @override
@@ -65,7 +75,7 @@ class _AdminPageState extends State<AdminPage> {
       ),
       body: Column(
         children: [
-          // Buttons Row
+          // Button Row to navigate to different forms
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
@@ -77,7 +87,31 @@ class _AdminPageState extends State<AdminPage> {
                       height: 45,
                       child: ItemCard(
                         item,
-                        onAddRestaurant: addRestaurant,
+                        onAddRestaurant: (name, location) {},
+                        onAddProduct: () {
+                          // If "Add Product" button is pressed, navigate to ProductForm
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return FutureBuilder<List<Toko>>(
+                                  future: tokoList,
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState == ConnectionState.waiting) {
+                                      return const Center(child: CircularProgressIndicator());
+                                    } else if (snapshot.hasError) {
+                                      return Center(child: Text('Error: ${snapshot.error}'));
+                                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                                      return const Center(child: Text('No Restaurants Found'));
+                                    }
+
+                                    return ProductForm(tokoList: snapshot.data!); // Pass the fetched tokoList
+                                  },
+                                );
+                              },
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ),
@@ -87,16 +121,27 @@ class _AdminPageState extends State<AdminPage> {
           ),
           // Restaurant List
           Expanded(
-            child: ListView.builder(
-              itemCount: welcomeData.toko.length,
-              itemBuilder: (context, index) {
-                final toko = welcomeData.toko[index];
-                return Card(
-                  margin: EdgeInsets.all(8.0),
-                  child: ListTile(
-                    title: Text(toko.fields.name),
-                    subtitle: Text(toko.fields.location),
-                  ),
+            child: FutureBuilder<List<Toko>>(
+              future: tokoList,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('No Restaurants Found'));
+                }
+
+                return ListView.builder(
+                  itemCount: snapshot.data!.length,
+                  itemBuilder: (context, index) {
+                    final toko = snapshot.data![index];
+                    return FoodCard(
+                      title: toko.name,
+                      location: toko.location,
+                      restaurantId: toko.id,
+                    );
+                  },
                 );
               },
             ),
@@ -109,9 +154,10 @@ class _AdminPageState extends State<AdminPage> {
 
 class ItemCard extends StatelessWidget {
   final ItemHomepage item;
-  final Function(Fields)? onAddRestaurant;
+  final Function(String, String)? onAddRestaurant;
+  final Function()? onAddProduct;
 
-  const ItemCard(this.item, {super.key, this.onAddRestaurant});
+  const ItemCard(this.item, {super.key, this.onAddRestaurant, this.onAddProduct});
 
   @override
   Widget build(BuildContext context) {
@@ -130,6 +176,11 @@ class ItemCard extends StatelessWidget {
                 ),
               ),
             );
+          } else if (item.name == "Add Product") {
+            // If "Add Product" is pressed, navigate to ProductForm
+            if (onAddProduct != null) {
+              onAddProduct!();
+            }
           } else {
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
@@ -159,4 +210,11 @@ class ItemCard extends StatelessWidget {
       ),
     );
   }
+}
+
+class ItemHomepage {
+  final String name;
+  final IconData icon;
+
+  ItemHomepage(this.name, this.icon);
 }
