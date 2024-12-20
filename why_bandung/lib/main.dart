@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:why_bandung/dashboard/screens/home.dart';
-<<<<<<< HEAD
 import 'package:why_bandung/dashboard/screens/profile.dart';
 import 'package:why_bandung/product_page/screens/product_page.dart';
 import 'package:why_bandung/dashboard_admin/screens/dashboard_admin.dart';
 import 'components/bottom_nav_bar.dart';
-=======
-import 'package:why_bandung/dashboard_admin/screens/dashboard_admin.dart';
->>>>>>> dashboard_admin
+import 'food_finder/screens/mainFinder.dart';
+import 'package:provider/provider.dart';
+import 'provider/cardProvider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => CardProvider()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -18,33 +24,21 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-<<<<<<< HEAD
-      debugShowCheckedModeBanner: false,
-      home: const MainApp(isAdmin: true), // Toggle isAdmin to true or false
-=======
-      title: 'WhyBandung?',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        //colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
-        useMaterial3: true,
+    return ChangeNotifierProvider(
+      create: (context) => CardProvider(),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+                elevation: 8,
+                backgroundColor: Colors.white,
+                shape: CircleBorder(),
+                minimumSize: Size.square(80)),
+          ),
+        ),
+        home: const MainFinder(),
       ),
-      home: AdminPage(),
->>>>>>> dashboard_admin
     );
   }
 }
@@ -93,7 +87,7 @@ class _MainAppState extends State<MainApp> {
 
   String _getCurrentPageName(int index) {
     if (widget.isAdmin) {
-      return ['Home','Search', 'Admin', 'Profile'][index];
+      return ['Home', 'Search', 'Admin', 'Profile'][index];
     } else {
       return ['Home', 'Search', 'Profile'][index];
     }
@@ -113,4 +107,3 @@ class _MainAppState extends State<MainApp> {
     );
   }
 }
-
