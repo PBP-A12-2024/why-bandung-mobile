@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert'; // For encoding the data into JSON
+import 'package:why_bandung/dashboard_admin/screens/dashboard_admin.dart';
 
 class RestoEntryFormPage extends StatefulWidget {
   final Function(String, String)? onSubmit;
@@ -17,7 +18,7 @@ class _RestoEntryFormPageState extends State<RestoEntryFormPage> {
 
   // Function to handle form submission and send data to Django
   Future<void> submitRestaurant() async {
-    final url = 'http://localhost:8000/admin/create-restaurant-flutter/';  // Django API URL
+    final url = 'http://localhost:8000/admin/create-restaurant-flutter/'; // Django API URL
 
     // Prepare the data to be sent
     final Map<String, dynamic> data = {
@@ -29,7 +30,7 @@ class _RestoEntryFormPageState extends State<RestoEntryFormPage> {
     final response = await http.post(
       Uri.parse(url),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(data),  // Convert data to JSON
+      body: jsonEncode(data), // Convert data to JSON
     );
 
     // Handle response
@@ -44,7 +45,8 @@ class _RestoEntryFormPageState extends State<RestoEntryFormPage> {
             actions: [
               TextButton(
                 onPressed: () {
-                  Navigator.pop(context);
+                  Navigator.pop(context); // Close the dialog
+                  Navigator.pushReplacementNamed(context, '/dashboard'); // Navigate to Dashboard
                 },
                 child: Text('OK'),
               ),
@@ -63,7 +65,7 @@ class _RestoEntryFormPageState extends State<RestoEntryFormPage> {
             actions: [
               TextButton(
                 onPressed: () {
-                  Navigator.pop(context);
+                  Navigator.pop(context); // Close the dialog
                 },
                 child: Text('OK'),
               ),
@@ -86,6 +88,16 @@ class _RestoEntryFormPageState extends State<RestoEntryFormPage> {
         backgroundColor: Colors.white,
         centerTitle: true,
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => AdminPage()),
+              (route) => false, // Menghapus semua halaman sebelumnya
+            );
+          },
+        ),
       ),
       body: Form(
         key: _formKey,

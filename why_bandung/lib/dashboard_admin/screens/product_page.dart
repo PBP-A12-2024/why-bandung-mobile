@@ -3,12 +3,27 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:why_bandung/models/lib/produk_entry.dart';  // Your model for ProductEntry
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:why_bandung/dashboard_admin/screens/edit_produk.dart';
 
-class ProductPage extends StatelessWidget {
+class ProductPage extends StatefulWidget {
   final String restaurantId;  // Store the restaurant ID
   final String restaurantName;
 
   ProductPage({required this.restaurantId, required this.restaurantName});
+
+  @override
+  _ProductPageState createState() => _ProductPageState();
+}
+
+class _ProductPageState extends State<ProductPage> {
+  late Future<List<Produk>> _productsFuture;
+  List<Produk> _products = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _productsFuture = fetchProductsForToko(widget.restaurantId);
+  }
 
   // Function to fetch products based on restaurant ID
   Future<List<Produk>> fetchProductsForToko(String tokoId) async {
@@ -16,11 +31,7 @@ class ProductPage extends StatelessWidget {
     final response = await http.get(Uri.parse('http://localhost:8000/admin/get-products-by-toko/$tokoId/'));
 
     if (response.statusCode == 200) {
-      // If the response is successful, parse the data
-      //print('Response body: ${response.body}');  // Debugging response body
       final data = jsonDecode(response.body);
-      
-      // Convert the data to a list of Product objects
       return List<Produk>.from(data.map((item) => Produk.fromJson(item)));
     } else {
       print('Failed to load products. Status code: ${response.statusCode}');
@@ -28,14 +39,39 @@ class ProductPage extends StatelessWidget {
     }
   }
 
+  // Function to delete a product by ID
+  Future<void> deleteProduct(String productId) async {
+    try {
+      final response = await http.delete(
+        Uri.parse('http://localhost:8000/admin/delete-product-flutter/$productId/'),
+      );
+
+      if (response.statusCode == 200) {
+        // If delete is successful, update local state
+        setState(() {
+          _products.removeWhere((product) => product.id == productId);
+        });
+      } else {
+        throw Exception('Failed to delete product');
+      }
+    } catch (e) {
+      print('Error deleting product: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to delete product: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[200], // Light grey background
       appBar: AppBar(
-        title: Text('Produk di $restaurantName'),
+        title: Text('Produk di ${widget.restaurantName}'),
+        backgroundColor: Colors.grey[200],
       ),
       body: FutureBuilder<List<Produk>>(
-        future: fetchProductsForToko(restaurantId),  // Get products by restaurant ID
+        future: _productsFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -45,42 +81,142 @@ class ProductPage extends StatelessWidget {
             return const Center(child: Text('No Products Found'));
           }
 
-          // If the data is successfully fetched, display it in a ListView
+          // Update the local product list with fetched data
+          _products = snapshot.data!;
+
           return ListView.builder(
-            itemCount: snapshot.data!.length,
+            itemCount: _products.length,
             itemBuilder: (context, index) {
-              final product = snapshot.data![index];
-              return ListTile(
-                contentPadding: EdgeInsets.all(10),
-                leading: product.image.isNotEmpty
-                    ? CachedNetworkImage(
-                        imageUrl: product.image,
-                        width: 60,
-                        height: 60,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) => CircularProgressIndicator(),  // Placeholder while loading
-                        errorWidget: (context, url, error) => Icon(Icons.error),  // Error icon if image fails to load
-                      )
-                    : Icon(Icons.image, size: 60),  // Placeholder icon if no image
-                title: Text(product.name),
-                subtitle: Text('Rp ${product.price}\n${product.description}'),
-                isThreeLine: true,
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.edit),
-                      onPressed: () {
-                        // Handle Edit functionality
-                      },
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.delete),
-                      onPressed: () {
-                        // Handle Delete functionality
-                      },
-                    ),
-                  ],
+              final product = _products[index];
+              return Card(
+                color: Colors.white, // White card color
+                margin: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                elevation: 4,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Product Image
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: CachedNetworkImage(
+                          imageUrl: product.image,
+                          width: 80,
+                          height: 80,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => CircularProgressIndicator(),
+                          errorWidget: (context, url, error) => Icon(Icons.image, size: 80),
+                        ),
+                      ),
+                      SizedBox(width: 10),
+                      // Product Details
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              product.name,
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              'Rp ${product.price}',
+                              style: TextStyle(fontSize: 16, color: Colors.green),
+                            ),
+                            Text(
+                              product.description,
+                              style: TextStyle(fontSize: 14, color: Colors.grey),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Action Buttons
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.edit, color: Colors.grey),
+                            onPressed: () async {
+                              final result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => EditProductPage(product: product),
+                                ),
+                              );
+
+                              if (result == true) {
+                                // Refresh the product list after editing
+                                setState(() {
+                                  _productsFuture = fetchProductsForToko(widget.restaurantId);
+                                });
+                              }
+                            },
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.delete, color: Colors.grey),
+                            onPressed: () async {
+                              bool? confirm = await showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  backgroundColor: Colors.white, // Background putih
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10), // Sudut melengkung
+                                  ),
+                                  title: const Text(
+                                    'Konfirmasi',
+                                    style: TextStyle(color: Colors.black), // Teks hitam
+                                  ),
+                                  content: const Text(
+                                    'Apakah Anda yakin ingin menghapus produk ini?',
+                                    style: TextStyle(color: Colors.black), // Teks hitam
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.of(context).pop(false),
+                                      style: ButtonStyle(
+                                        foregroundColor: WidgetStateProperty.all(Colors.black), // Warna teks hitam
+                                        overlayColor: WidgetStateProperty.resolveWith<Color?>(
+                                          (states) {
+                                            if (states.contains(WidgetState.hovered)) {
+                                              return Colors.grey.shade300; // Hover abu-abu muda
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                                      ),
+                                      child: const Text('Batal'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () => Navigator.of(context).pop(true),
+                                      style: ButtonStyle(
+                                        foregroundColor: WidgetStateProperty.all(Colors.black), // Warna teks hitam
+                                        overlayColor: WidgetStateProperty.resolveWith<Color?>(
+                                          (states) {
+                                            if (states.contains(WidgetState.hovered)) {
+                                              return Colors.grey.shade300; // Hover abu-abu muda
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                                      ),
+                                      child: const Text('Hapus'),
+                                    ),
+                                  ],
+                                ),
+                              );
+
+                              if (confirm == true) {
+                                await deleteProduct(product.id);
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               );
             },

@@ -1,62 +1,84 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:why_bandung/models/lib/resto_entry.dart';
 import 'dart:convert';
+import 'package:why_bandung/models/lib/produk_entry.dart';
 
-class ProductForm extends StatefulWidget {
-  final List<Toko> tokoList; // Add tokoList parameter
+class EditProductPage extends StatefulWidget {
+  final Produk product;
 
-  // Accept tokoList as a parameter in the constructor
-  ProductForm({required this.tokoList});
+  EditProductPage({required this.product});
 
   @override
-  _ProductFormState createState() => _ProductFormState();
+  _EditProductPageState createState() => _EditProductPageState();
 }
 
-class _ProductFormState extends State<ProductForm> {
+class _EditProductPageState extends State<EditProductPage> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _priceController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _imageController = TextEditingController();
-  String? _selectedToko;
+  late String _name;
+  late String _price;
+  late String _description;
+  late String _imageUrl;
+  String? _selectedTokoId;
+  List<Map<String, dynamic>> _tokoList = [];
 
-  // Fungsi untuk menambahkan produk
-  Future<void> addProduct() async {
-    final String name = _nameController.text;
-    final String price = _priceController.text;
-    final String description = _descriptionController.text;
-    final String image = _imageController.text;
-    final String tokoId = _selectedToko!;
+  @override
+  void initState() {
+    super.initState();
+    _name = widget.product.name;
+    _price = widget.product.price.toString();
+    _description = widget.product.description;
+    _imageUrl = widget.product.image;
+    _selectedTokoId = widget.product.tokoId.toString();
+    _fetchTokoList();
+  }
 
-    final response = await http.post(
-      Uri.parse('http://localhost:8000/admin/create-product-flutter/'),
+  Future<void> _fetchTokoList() async {
+    final url = Uri.parse('http://localhost:8000/admin/get-all-toko-names/');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      setState(() {
+        _tokoList = List<Map<String, dynamic>>.from(data['toko_list']);
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to fetch toko list')),
+      );
+    }
+  }
+
+  Future<void> _updateProduct() async {
+    final url = Uri.parse('http://localhost:8000/admin/update-product-flutter/${widget.product.id}/');
+    final response = await http.put(
+      url,
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
-        'name': name,
-        'price': int.parse(price),
-        'description': description,
-        'image': image,
-        'toko': tokoId,
+        'name': _name,
+        'price': _price,
+        'description': _description,
+        'image': _imageUrl,
+        'toko_id': _selectedTokoId,
       }),
     );
 
-    if (response.statusCode == 201) {
-      Navigator.pop(context); // Kembali ke halaman sebelumnya setelah produk ditambahkan
+    if (response.statusCode == 200) {
+      Navigator.of(context).pop(true); // Indicate success
     } else {
-      throw Exception('Failed to add product');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update product')),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Light grey background
+      backgroundColor: Colors.white, // Match background to second image
       appBar: AppBar(
-        title: Text("Add Product"),
-        backgroundColor: Colors.white,
-        centerTitle: true,
-        elevation: 0),
+        title: const Text('Edit Product'),
+        backgroundColor: Colors.teal,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -65,11 +87,9 @@ class _ProductFormState extends State<ProductForm> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               TextFormField(
-                controller: _nameController,
+                initialValue: _name,
                 decoration: InputDecoration(
                   labelText: 'Product Name',
-                  hintStyle: const TextStyle(color: Colors.black),
-                  labelStyle: const TextStyle(color: Colors.black),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -81,20 +101,19 @@ class _ProductFormState extends State<ProductForm> {
                     ),
                   ),
                 ),
+                onChanged: (value) => _name = value,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a product name';
+                    return 'Product name cannot be empty';
                   }
                   return null;
                 },
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               TextFormField(
-                controller: _priceController,
+                initialValue: _price,
                 decoration: InputDecoration(
                   labelText: 'Price',
-                  hintStyle: const TextStyle(color: Colors.black),
-                  labelStyle: const TextStyle(color: Colors.black),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -107,20 +126,19 @@ class _ProductFormState extends State<ProductForm> {
                   ),
                 ),
                 keyboardType: TextInputType.number,
+                onChanged: (value) => _price = value,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a price';
+                    return 'Price cannot be empty';
                   }
                   return null;
                 },
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               TextFormField(
-                controller: _descriptionController,
+                initialValue: _description,
                 decoration: InputDecoration(
                   labelText: 'Description',
-                  hintStyle: const TextStyle(color: Colors.black),
-                  labelStyle: const TextStyle(color: Colors.black),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -132,20 +150,19 @@ class _ProductFormState extends State<ProductForm> {
                     ),
                   ),
                 ),
+                onChanged: (value) => _description = value,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a description';
+                    return 'Description cannot be empty';
                   }
                   return null;
                 },
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               TextFormField(
-                controller: _imageController,
+                initialValue: _imageUrl,
                 decoration: InputDecoration(
-                  labelText: 'Product Image URL',
-                  hintStyle: const TextStyle(color: Colors.black),
-                  labelStyle: const TextStyle(color: Colors.black),
+                  labelText: 'Image URL',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -157,67 +174,71 @@ class _ProductFormState extends State<ProductForm> {
                     ),
                   ),
                 ),
+                onChanged: (value) => _imageUrl = value,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter an image URL';
+                    return 'Image URL cannot be empty';
                   }
                   return null;
                 },
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               DropdownButtonFormField<String>(
-                value: _selectedToko,
-                decoration: InputDecoration(
-                  labelText: 'Select Restaurant',
-                  hintStyle: const TextStyle(color: Colors.black),
-                  labelStyle: const TextStyle(color: Colors.black),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(
-                      color: Colors.black,
-                      width: 2.0,
-                    ),
-                  ),
-                ),
-                onChanged: (String? newValue) {
+                value: _selectedTokoId,
+                items: _tokoList
+                    .map((toko) => DropdownMenuItem(
+                          value: toko['id'].toString(),
+                          child: Text(toko['name']),
+                        ))
+                    .toList(),
+                onChanged: (value) {
                   setState(() {
-                    _selectedToko = newValue;
+                    _selectedTokoId = value!;
                   });
                 },
-                items: widget.tokoList.map<DropdownMenuItem<String>>((Toko toko) {
-                  return DropdownMenuItem<String>(
-                    value: toko.id,
-                    child: Text(toko.name),
-                  );
-                }).toList(),
+                decoration: InputDecoration(
+                  labelText: 'Select Restaurant',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Colors.black,
+                      width: 2.0,
+                    ),
+                  ),
+                ),
                 validator: (value) {
-                  if (value == null) {
+                  if (value == null || value.isEmpty) {
                     return 'Please select a restaurant';
                   }
                   return null;
                 },
               ),
-              SizedBox(height: 20),
-              Center(
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        addProduct();
-                      }
-                    },
-                    child: Text('Add Product'),
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white, backgroundColor: const Color(0xFF5F9EA0), padding: EdgeInsets.symmetric(vertical: 15), // Ensure the text color is white
-                      textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      await _updateProduct();
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF5F9EA0),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    textStyle: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: const Text(
+                    'Update Product',
+                    style: TextStyle(color: Colors.white),
                   ),
                 ),
               ),
